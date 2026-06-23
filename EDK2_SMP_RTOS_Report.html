@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EDK2 + SMP RTOS Development Report</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #2c3e50;
+            border-bottom: 3px solid #3498db;
+            padding-bottom: 10px;
+        }
+        h2 {
+            color: #2980b9;
+            margin-top: 30px;
+        }
+        h3 {
+            color: #34495e;
+            margin-top: 25px;
+        }
+        .section {
+            margin-bottom: 30px;
+        }
+        .step {
+            background: #f8f9fa;
+            border-left: 4px solid #3498db;
+            padding: 15px;
+            margin: 15px 0;
+        }
+        .bug {
+            background: #fff3f3;
+            border-left: 4px solid #e74c3c;
+            padding: 15px;
+            margin: 15px 0;
+        }
+        .fix {
+            background: #f3fff3;
+            border-left: 4px solid #27ae60;
+            padding: 15px;
+            margin: 15px 0;
+        }
+        .code {
+            background: #2c3e50;
+            color: #ecf0f1;
+            padding: 15px;
+            border-radius: 4px;
+            overflow-x: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+        }
+        .output {
+            background: #34495e;
+            color: #ecf0f1;
+            padding: 15px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            white-space: pre-wrap;
+        }
+        .file-ref {
+            background: #e8f4f8;
+            padding: 8px 12px;
+            border-radius: 4px;
+            font-family: monospace;
+            display: inline-block;
+            margin: 5px 0;
+        }
+        ul {
+            padding-left: 20px;
+        }
+        li {
+            margin: 8px 0;
+        }
+        .timestamp {
+            color: #7f8c8d;
+            font-size: 0.9em;
+            font-style: italic;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>EDK2 + SMP RTOS Development and Debugging Report</h1>
+        <p class="timestamp">Generated: March 24, 2026</p>
+        
+        <div class="section">
+            <h2>Project Overview</h2>
+            <p>This report documents the complete development process of a multi-CPU RTOS running on EDK2 UEFI firmware in QEMU ARM64 environment. The system demonstrates parallel execution of tasks across 4 Cortex-A53 CPUs using EFI_MP_SERVICES_PROTOCOL.</p>
+            
+            <h3>Key Components:</h3>
+            <ul>
+                <li><strong>Firmware:</strong> EDK2 ArmVirtQemu (AARCH64 RELEASE)</li>
+                <li><strong>Application:</strong> SmpRtos.efi - Custom UEFI application</li>
+                <li><strong>Platform:</strong> QEMU ARM Virt machine with 4 CPUs</li>
+                <li><strong>Protocol:</strong> EFI_MP_SERVICES_PROTOCOL for multi-CPU coordination</li>
+            </ul>
+        </div>
+
+        <div class="section">
+            <h2>Development Process</h2>
+            
+            <h3>Phase 1: Environment Setup</h3>
+            <div class="step">
+                <h4>Step 1.1: Clone EDK2 Source</h4>
+                <p>Cloned EDK2 repository from Gitee mirror due to GitHub connectivity issues.</p>
+                <div class="code">git clone --depth 1 https://gitee.com/tianocore/edk2.git /home/zsw/work/opencode/edk/edk2</div>
+            </div>
+            
+            <div class="step">
+                <h4>Step 1.2: Initialize Submodules</h4>
+                <p>Download all required submodules including OpenSSL, Brotli, etc.</p>
+                <div class="code">cd /home/zsw/work/opencode/edk/edk2<br>git submodule update --init --recursive</div>
+            </div>
+            
+            <div class="step">
+                <h4>Step 1.3: Build EDK2 BaseTools</h4>
+                <p>Compile the EDK2 build tools required for firmware compilation.</p>
+                <div class="code">cd /home/zsw/work/opencode/edk/edk2<br>make -C BaseTools -j$(nproc)</div>
+            </div>
+
+            <h3>Phase 2: Firmware Configuration</h3>
+            <div class="step">
+                <h4>Step 2.1: Set Cross-Compiler Environment</h4>
+                <p>Configure AARCH64 cross-compilation toolchain.</p>
+                <div class="code">export GCC_AARCH64_PREFIX=aarch64-linux-gnu-</div>
+                <p><span class="file-ref">Memory: EDK2 AARCH64 build requires GCC_AARCH64_PREFIX env var</span></p>
+            </div>
+            
+            <div class="step">
+                <h4>Step 2.2: Build ArmVirtQemu Firmware</h4>
+                <p>Initial build attempt failed due to missing RNG library compatibility.</p>
+                <div class="code">build -a AARCH64 -t GCC -p ArmVirtPkg/ArmVirtQemu.dsc -b RELEASE</div>
+            </div>
+
+            <h3>Phase 3: Bug Identification and Resolution</h3>
+            
+            <div class="bug">
+                <h4>Bug 1: RNG Library Crash (RNDR Instruction)</h4>
+                <p><strong>Symptom:</strong> EDK2 firmware crashed with Synchronous Exception at early boot</p>
+                <p><strong>Root Cause:</strong> RngDxe driver uses ARMv8.5 RNDR instruction not supported by QEMU 4.2</p>
+                <div class="output">Synchronous Exception at 0x5F7ACECC
+ESR: EC 0x00 IL 0x1 ISS 0x00000000</div>
+            </div>
+            
+            <div class="fix">
+                <h4>Fix 1: Replace RNG Library</h4>
+                <p>Patched ArmVirtQemu.dsc to use BaseRngLibNull instead of BaseRngLib</p>
+                <div class="code"># In ArmVirt.dsc.inc<br>RngLib|RngLibNull.inf<br><br># In ArmVirtQemu.dsc<br># Comment out:<br># RngDxe</div>
+            </div>
+            
+            <div class="bug">
+                <h4>Bug 2: Missing MP Core Info HOB</h4>
+                <p><strong>Symptom:</strong> MpServiceProtocol not found after firmware boot</p>
+                <p><strong>Root Cause:</strong> ArmPsciMpServicesDxe requires gArmMpCoreInfoGuid HOB to enumerate CPUs</p>
+                <div class="output">ERROR: Cannot find MpServiceProtocol: EFI_NOT_FOUND</div>
+            </div>
+            
+            <div class="fix">
+                <h4>Fix 2: Create MP Core Info PEIM</h4>
+                <p>Created custom PEIM to publish HOB with 4 CPU entries for QEMU virt platform</p>
+                <div class="code">/* ArmVirtQemuMpCoreInfoPeim.c */<br>#define QEMU_CPU_COUNT 4<br>ARM_CORE_INFO CoreInfo[QEMU_CPU_COUNT];<br>for (i = 0; i &lt; QEMU_CPU_COUNT; i++) {<br>    CoreInfo[i].Mpidr = (UINT64)i;<br>    CoreInfo[i].Mailbox* = 0; // PSCI handles wakeup<br>}<br>BuildGuidDataHob(&gArmMpCoreInfoGuid, CoreInfo, sizeof(CoreInfo));</div>
+                <p>Added to DSC and FDF files to include in firmware build.</p>
+            </div>
+            
+            <div class="bug">
+                <h4>Bug 3: PSCI Conduit Mismatch</h4>
+                <p><strong>Symptom:</strong> Synchronous Exception when AP tries to execute after StartupThisAP</p>
+                <p><strong>Root Cause:</strong> ArmPsciMpServicesDxe uses ArmCallSmc (smc #0) but QEMU virt PSCI uses HVC</p>
+                <div class="code">// QEMU device tree shows:<br>psci {<br>    method = "hvc";<br>    compatible = "arm,psci-0.2";<br>}</div>
+            </div>
+            
+            <div class="fix">
+                <h4>Fix 3: Custom ArmSmcLib with HVC</h4>
+                <p>Created SmpRtosPkg/Library/ArmSmcLibHvc that overrides ArmCallSmc to use hvc #0</p>
+                <div class="code">// AArch64/ArmSmc.S<br>ASM_FUNC(ArmCallSmc)<br>    // ... load args ...<br>    hvc   #0    // Changed from smc #0<br>    // ... store results ...</div>
+                <p>Override in DSC for ArmPsciMpServicesDxe only:</p>
+                <div class="code">ArmPkg/Drivers/ArmPsciMpServicesDxe/ArmPsciMpServicesDxe.inf {<br>  &lt;LibraryClasses&gt;<br>    ArmSmcLib|SmpRtosPkg/Library/ArmSmcLibHvc/ArmSmcLibHvc.inf<br>}</div>
+            </div>
+
+            <h3>Phase 4: UEFI Application Development</h3>
+            
+            <div class="step">
+                <h4>Step 4.1: Create SmpRtos Package Structure</h4>
+                <div class="code">SmpRtosPkg/<br>├── Application/<br>│   └── SmpRtos/<br>│       ├── SmpRtos.c<br>│       └── SmpRtos.inf<br>├── Library/<br>│   └── ArmSmcLibHvc/<br>│       ├── ArmSmcLibHvc.inf<br>│       └── AArch64/ArmSmc.S<br>└── SmpRtosPkg.dsc</div>
+            </div>
+            
+            <div class="step">
+                <h4>Step 4.2: Implement Multi-CPU Task Execution</h4>
+                <p>Used StartupAllAPs with blocking mode for true parallel execution</p>
+                <div class="code">Status = MpServices->StartupAllAPs(<br>    MpServices,<br>    CpuTask,           // Task function<br>    FALSE,             // SingleThread = FALSE (parallel)<br>    NULL,              // WaitEvent = NULL (blocking)<br>    0,                 // Timeout = 0 (infinite)<br>    (VOID *)&Shared,   // Shared context<br>    NULL               // FailedCpuList<br>);</div>
+            </div>
+            
+            <div class="step">
+                <h4>Step 4.3: CPU Identification in Tasks</h4>
+                <p>Each AP calls WhoAmI to identify itself since StartupAllAPs shares one context</p>
+                <div class="code">STATIC VOID EFIAPI CpuTask (VOID *Context)<br>{<br>    SHARED_CONTEXT *Shared = (SHARED_CONTEXT *)Context;<br>    UINTN Cpu = 0;<br>    Shared->MpServices->WhoAmI(Shared->MpServices, &Cpu);<br>    // ... execute tasks ...<br>}</div>
+            </div>
+
+            <h3>Phase 5: Testing and Verification</h3>
+            
+            <div class="step">
+                <h4>Step 5.1: Create Boot Disk Image</h4>
+                <div class="code">dd if=/dev/zero of=edk2_boot.img bs=1M count=64<br>mkfs.vfat -F 32 edk2_boot.img<br>mmd -i edk2_boot.img ::/EFI ::/EFI/BOOT<br>mcopy -i edk2_boot.img SmpRtos.efi ::/EFI/BOOT/BOOTAA64.EFI</div>
+            </div>
+            
+            <div class="step">
+                <h4>Step 5.2: QEMU Launch Script</h4>
+                <p>Automated script to boot EDK2 firmware + SmpRtos application</p>
+                <div class="code">qemu-system-aarch64 \<br>    -machine virt \<br>    -cpu cortex-a53 \<br>    -smp 4 \<br>    -m 512M \<br>    -nographic \<br>    -drive if=pflash,format=raw,file=QEMU_EFI.fd,readonly=on \<br>    -drive if=pflash,format=raw,file=QEMU_VARS.fd \<br>    -drive if=virtio,format=raw,file=edk2_boot.img</div>
+            </div>
+            
+            <div class="step">
+                <h4>Step 5.3: Successful Execution Output</h4>
+                <div class="output">============================================
+  Simple SMP RTOS Demo - EDK2 UEFI App     
+============================================
+[CPU 00] BSP (Boot Strap Processor)
+[CPU 00] Total processors  : 4
+[CPU 00] Enabled processors: 4
+
+[CPU 00] === Launching ALL APs via StartupAllAPs (blocking, parallel) ===
+
+[CPU 01] AP started, running 5 tasks
+[CPU 03] AP started, running 5 tasks
+[CPU 02] AP started, running 5 tasks
+[CPU 01] Task 1/5
+[CPU 03] Task 1/5
+[CPU 02] Task 1/5
+[CPU 01] Task 2/5
+[CPU 02] Task 2/5
+[CPU 03] Task 2/5
+...
+[CPU 01] DONE: 5 tasks completed
+[CPU 02] DONE: 5 tasks completed
+[CPU 03] DONE: 5 tasks completed
+
+[CPU 00] APs finished. BSP running 5 tasks...
+[CPU 00] Task 1/5
+[CPU 00] Task 2/5
+...
+
+Task completion summary:
+  CPU 00: 5 tasks completed
+  CPU 01: 5 tasks completed
+  CPU 02: 5 tasks completed
+  CPU 03: 5 tasks completed
+[CPU 00] SMP RTOS demo on EDK2 complete!</div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>Key Technical Insights</h2>
+            
+            <h3>1. EDK2 Build System</h3>
+            <ul>
+                <li>Cross-compilation requires GCC_AARCH64_PREFIX environment variable</li>
+                <li>Library overrides can be applied per-module in DSC files</li>
+                <li>PEIMs execute in PEI phase before DXE drivers</li>
+            </ul>
+            
+            <h3>2. Multi-CPU Boot Sequence</h3>
+            <ol>
+                <li>BSP (CPU 0) boots EDK2 firmware</li>
+                <li>PEIM publishes MP Core Info HOB</li>
+                <li>ArmPsciMpServicesDxe loads and enumerates CPUs via HOB</li>
+                <li>UEFI application locates MpServiceProtocol</li>
+                <li>StartupAllAPs launches tasks on all APs simultaneously</li>
+                <li>BSP blocks until all APs complete, then runs its own tasks</li>
+            </ol>
+            
+            <h3>3. QEMU Compatibility Issues</h3>
+            <ul>
+                <li>QEMU 4.2 uses HVC for PSCI, not SMC (ARM standard)</li>
+                <li>ARMv8.5 instructions (RNDR) not emulated in older QEMU</li>
+                <li>Device tree must be inspected to understand platform configuration</li>
+            </ul>
+        </div>
+
+        <div class="section">
+            <h2>Lessons Learned</h2>
+            <ul>
+                <li><strong>Always check platform device tree</strong> - QEMU's PSCI method differs from hardware</li>
+                <li><strong>Use blocking StartupAllAPs</strong> - Non-blocking mode with spin-wait can deadlock</li>
+                <li><strong>HOBs are critical for MP services</strong> - Without proper HOB, drivers won't initialize</li>
+                <li><strong>Cross-compiler environment</strong> - EDK2 build system is sensitive to toolchain setup</li>
+                <li><strong>Incremental testing</strong> - Build firmware, test, then build application separately</li>
+            </ul>
+        </div>
+
+        <div class="section">
+            <h2>Files Created/Modified</h2>
+            <h3>Source Files:</h3>
+            <ul>
+                <li><span class="file-ref">/home/zsw/work/opencode/edk/edk2/SmpRtosPkg/Application/SmpRtos/SmpRtos.c</span> - Main UEFI application</li>
+                <li><span class="file-ref">/home/zsw/work/opencode/edk/edk2/SmpRtosPkg/Application/SmpRtos/SmpRtos.inf</span> - Application INF</li>
+                <li><span class="file-ref">/home/zsw/work/opencode/edk/edk2/SmpRtosPkg/Library/ArmSmcLibHvc/AArch64/ArmSmc.S</span> - HVC-based SMC library</li>
+                <li><span class="file-ref">/home/zsw/work/opencode/edk/edk2/SmpRtosPkg/Library/ArmSmcLibHvc/ArmSmcLibHvc.inf</span> - Library INF</li>
+                <li><span class="file-ref">/home/zsw/work/opencode/edk/edk2/SmpRtosPkg/Peim/ArmVirtQemuMpCoreInfoPeim/ArmVirtQemuMpCoreInfoPeim.c</span> - MP Core Info PEIM</li>
+            </ul>
+            
+            <h3>DSC/FDF Modifications:</h3>
+            <ul>
+                <li>Patched RNG library to use BaseRngLibNull</li>
+                <li>Added ArmVirtQemuMpCoreInfoPeim to firmware</li>
+                <li>Overrode ArmSmcLib for ArmPsciMpServicesDxe</li>
+            </ul>
+            
+            <h3>Scripts:</h3>
+            <ul>
+                <li><span class="file-ref">/home/zsw/work/qoder/mboot/run_edk2_rtos.sh</span> - Automated QEMU launch script</li>
+            </ul>
+        </div>
+
+        <div class="section">
+            <h2>Conclusion</h2>
+            <p>This project successfully demonstrated a complete multi-CPU RTOS running on EDK2 UEFI firmware in QEMU. Through systematic debugging of platform compatibility issues, PSCI conduit mismatches, and MP service initialization problems, a robust solution was developed that achieves true parallel execution across all 4 virtual CPUs.</p>
+            <p>The methodology of identifying root causes through exception analysis, device tree inspection, and targeted patches provides a reusable approach for future EDK2 multi-core development projects.</p>
+        </div>
+    </div>
+</body>
+</html>
