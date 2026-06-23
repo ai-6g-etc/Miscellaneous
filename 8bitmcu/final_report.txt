@@ -1,0 +1,516 @@
+==============================================================================
+               8-BIT MCU FULL CHIP DESIGN - SIGNOFF REPORT
+==============================================================================
+Generated: 2026年 05月 12日 星期二 11:45:38 CST
+
+------------------------------------------------------------------------------
+0. POWER DESIGN SUMMARY
+------------------------------------------------------------------------------
+Power Enhancement: ENABLED (dual-domain UPF, power-aware synthesis)
+
+--- Baseline vs Enhanced Power ---
+Baseline (post-PnR):    743 uW
+Synthesis (DC):         562 uW
+PnR (ICC post-layout):  690 uW
+
+--- Power Design Features ---
+UPF:              Dual domains (PD_CORE + PD_AON) - syn/results/CORE.upf
+SAIF:             Generated from VCD simulation - syn/results/CHIP_TOP_PAD.saif
+ICG Cells:        0 (clock gating not inferred from RTL)
+
+--- Power Ring Design (prng.txt methodology) ---
+Core Ring:        M7 (horizontal) / M8 (vertical)
+Ring Width:       4.0 um
+Ring Spacing:     2.0 um
+Ring Offset:      5.0 um from core boundary
+Macro Rings:      SRAM/ROM blocks with 2.0 um width, 5.0 um halo
+Power Straps:     M7/M8, 2.0 um width, 40.0 um pitch
+IR Drop:          Analyzed in PnR - pnr/reports/ir_drop.rpt
+
+------------------------------------------------------------------------------
+1. SYNTHESIS (Design Compiler)
+------------------------------------------------------------------------------
+Status: COMPLETED
+Netlist: syn/results/CHIP_TOP_PAD.vg
+Constraints: syn/results/CHIP_TOP_PAD.sdc
+UPF: syn/results/CORE.upf (dual power domains)
+SAIF: syn/results/CHIP_TOP_PAD.saif (activity from VCD)
+Power optimization: -power_effort high
+
+--- QoR Summary ---
+Information: Updating design information... (UID-85)
+ 
+****************************************
+Report : qor
+Design : CHIP_TOP_PAD
+Version: T-2022.03-SP2
+Date   : Tue May 12 11:36:45 2026
+****************************************
+
+
+  Timing Path Group 'TCK'
+  -----------------------------------
+  Levels of Logic:           7.000000
+  Critical Path Length:      8.254039
+  Critical Path Slack:      86.695953
+  Critical Path Clk Period:
+                           100.000000
+  Total Negative Slack:      0.000000
+  No. of Violating Paths:    0.000000
+  Worst Hold Violation:      0.000000
+  Total Hold Violation:      0.000000
+  No. of Hold Violations:    0.000000
+  -----------------------------------
+
+  Timing Path Group 'clk'
+  -----------------------------------
+  Levels of Logic:          13.000000
+  Critical Path Length:      9.590346
+  Critical Path Slack:       0.014643
+  Critical Path Clk Period: 10.000000
+
+--- Area ---
+ 
+****************************************
+Report : area
+Design : CHIP_TOP_PAD
+Version: T-2022.03-SP2
+Date   : Tue May 12 11:36:45 2026
+****************************************
+
+Library(s) Used:
+
+    saed90nm_typ (File: /home/master/work/8bitmcu/full_flow/lib/models/saed90nm_typ_ht.db)
+
+Number of ports:                          797
+Number of nets:                          2290
+Number of cells:                         1393
+Number of combinational cells:           1045
+Number of sequential cells:               261
+Number of macros/black boxes:               0
+Number of buf/inv:                        285
+Number of references:                      31
+
+Combinational area:               9731.700020
+Buf/Inv area:                     1822.093061
+Noncombinational area:            7998.163993
+Macro/Black Box area:                0.000000
+Net Interconnect area:      undefined  (No wire load specified)
+
+Total cell area:                 17729.864013
+Total area:                 undefined
+
+Hierarchical area distribution
+------------------------------
+
+                                  Global cell area           Local cell area
+                                  -------------------  ---------------------------- 
+Hierarchical cell                 Absolute    Percent  Combi-     Noncombi-  Black-
+                                  Total       Total    national   national   boxes   Design
+--------------------------------  ----------  -------  ---------  ---------  ------  ---------------------
+CHIP_TOP_PAD                      17729.8640    100.0    22.1180     0.0000  0.0000  CHIP_TOP_PAD
+gen_ab_pad[0].u_pad_ab               12.9020      0.1    12.9020     0.0000  0.0000  PAD_OUT_7
+gen_ab_pad[1].u_pad_ab               12.9020      0.1    12.9020     0.0000  0.0000  PAD_OUT_6
+gen_ab_pad[2].u_pad_ab               12.9020      0.1    12.9020     0.0000  0.0000  PAD_OUT_5
+gen_ab_pad[3].u_pad_ab               12.9020      0.1    12.9020     0.0000  0.0000  PAD_OUT_4
+gen_ab_pad[4].u_pad_ab               12.9020      0.1    12.9020     0.0000  0.0000  PAD_OUT_3
+gen_ab_pad[5].u_pad_ab               12.9020      0.1    12.9020     0.0000  0.0000  PAD_OUT_2
+gen_ab_pad[6].u_pad_ab               12.9020      0.1    12.9020     0.0000  0.0000  PAD_OUT_1
+gen_ab_pad[7].u_pad_ab               12.9020      0.1    12.9020     0.0000  0.0000  PAD_OUT_0
+gen_db_pad[0].u_pad_db               26.7270      0.2    12.9030    13.8240  0.0000  PAD_BIDIR_test_7
+gen_db_pad[1].u_pad_db               26.7270      0.2    12.9030    13.8240  0.0000  PAD_BIDIR_test_6
+gen_db_pad[2].u_pad_db               26.7270      0.2    12.9030    13.8240  0.0000  PAD_BIDIR_test_5
+gen_db_pad[3].u_pad_db               26.7270      0.2    12.9030    13.8240  0.0000  PAD_BIDIR_test_4
+gen_db_pad[4].u_pad_db               26.7270      0.2    12.9030    13.8240  0.0000  PAD_BIDIR_test_3
+gen_db_pad[5].u_pad_db               26.7270      0.2    12.9030    13.8240  0.0000  PAD_BIDIR_test_2
+gen_db_pad[6].u_pad_db               26.7270      0.2    12.9030    13.8240  0.0000  PAD_BIDIR_test_1
+gen_db_pad[7].u_pad_db               26.7270      0.2    12.9030    13.8240  0.0000  PAD_BIDIR_test_0
+u_core                            17222.9880     97.1   357.1540   112.4640  0.0000  CHIP_TOP_test_1
+u_core/BSC_BIST_DONE                152.9860      0.9    92.1600    60.8260  0.0000  BSC_test_20
+u_core/BSC_BIST_FAIL                152.9860      0.9    92.1600    60.8260  0.0000  BSC_test_0
+u_core/BSC_BIST_START               152.9860      0.9    92.1600    60.8260  0.0000  BSC_test_1
+u_core/BSC_CLK                      152.9860      0.9    92.1600    60.8260  0.0000  BSC_test_2
+u_core/BSC_RST                      152.9860      0.9    92.1600    60.8260  0.0000  BSC_test_3
+u_core/IR_0                         797.5260      4.5   196.3020   601.2240  0.0000  JTAG_IR_test_1
+u_core/SOC_0                      12246.1390     69.1   193.5420     0.0000  0.0000  SoC
+u_core/SOC_0/CORE_0               10485.1000     59.1   129.1440     0.0000  0.0000  CORE
+u_core/SOC_0/CORE_0/ACC_0           353.8980      2.0   110.5940   243.3040  0.0000  ACC_test_1
+u_core/SOC_0/CORE_0/ADDR_MUX_0      102.2990      0.6   102.2990     0.0000  0.0000  ADDR_MUX
+u_core/SOC_0/CORE_0/ALU_0          1161.0190      6.5   940.6860     0.0000  0.0000  ALU
+u_core/SOC_0/CORE_0/ALU_0/add_62    220.3330      1.2   220.3330     0.0000  0.0000  ALU_DW01_add_0
+u_core/SOC_0/CORE_0/CTRL_0          587.1100      3.3   465.4580   121.6520  0.0000  CTRL_test_1
+u_core/SOC_0/CORE_0/IR_0            727.8980      4.1   241.2900   486.6080  0.0000  IR_test_1
+u_core/SOC_0/CORE_0/PC_0            510.5690      2.9   152.9880   243.3040  0.0000  PC_test_1
+u_core/SOC_0/CORE_0/PC_0/add_41     114.2770      0.6   114.2770     0.0000  0.0000  PC_DW01_inc_0
+u_core/SOC_0/CORE_0/REG_0          6913.1630     39.0  2909.7070  4003.4560  0.0000  REG_test_1
+u_core/SOC_0/MBIST_0               1567.4970      8.8   806.2620   646.9580  0.0000  MBIST_CTRL
+u_core/SOC_0/MBIST_0/add_87         114.2770      0.6   114.2770     0.0000  0.0000  MBIST_CTRL_DW01_inc_0
+u_core/TAP_0                        496.9990      2.8   345.7430   151.2560  0.0000  JTAG_TAP_test_1
+u_core/gen_bsc_ab[0].bsc_inst       152.9860      0.9    92.1600    60.8260  0.0000  BSC_test_4
+u_core/gen_bsc_ab[1].bsc_inst       152.9860      0.9    92.1600    60.8260  0.0000  BSC_test_5
+u_core/gen_bsc_ab[2].bsc_inst       152.9860      0.9    92.1600    60.8260  0.0000  BSC_test_6
+u_core/gen_bsc_ab[3].bsc_inst       152.9860      0.9    92.1600    60.8260  0.0000  BSC_test_7
+u_core/gen_bsc_ab[4].bsc_inst       152.9860      0.9    92.1600    60.8260  0.0000  BSC_test_8
+u_core/gen_bsc_ab[5].bsc_inst       152.9860      0.9    92.1600    60.8260  0.0000  BSC_test_9
+u_core/gen_bsc_ab[6].bsc_inst       152.9860      0.9    92.1600    60.8260  0.0000  BSC_test_10
+u_core/gen_bsc_ab[7].bsc_inst       152.9860      0.9    92.1600    60.8260  0.0000  BSC_test_11
+u_core/gen_bsc_db[0].bsc_inst       152.9860      0.9    92.1600    60.8260  0.0000  BSC_test_12
+u_core/gen_bsc_db[1].bsc_inst       152.9860      0.9    92.1600    60.8260  0.0000  BSC_test_13
+u_core/gen_bsc_db[2].bsc_inst       152.9860      0.9    92.1600    60.8260  0.0000  BSC_test_14
+u_core/gen_bsc_db[3].bsc_inst       152.9860      0.9    92.1600    60.8260  0.0000  BSC_test_15
+u_core/gen_bsc_db[4].bsc_inst       152.9860      0.9    92.1600    60.8260  0.0000  BSC_test_16
+u_core/gen_bsc_db[5].bsc_inst       152.9860      0.9    92.1600    60.8260  0.0000  BSC_test_17
+u_core/gen_bsc_db[6].bsc_inst       152.9860      0.9    92.1600    60.8260  0.0000  BSC_test_18
+u_core/gen_bsc_db[7].bsc_inst       152.9860      0.9    92.1600    60.8260  0.0000  BSC_test_19
+u_pad_bist_done                      12.9020      0.1    12.9020     0.0000  0.0000  PAD_OUT_9
+u_pad_bist_fail                      12.9020      0.1    12.9020     0.0000  0.0000  PAD_OUT_8
+u_pad_bist_start                     12.9020      0.1    12.9020     0.0000  0.0000  PAD_IN_0
+u_pad_clk                            12.9020      0.1    12.9020     0.0000  0.0000  PAD_IN_8
+u_pad_rst_n                          12.9020      0.1    12.9020     0.0000  0.0000  PAD_IN_7
+u_pad_tck                            12.9020      0.1    12.9020     0.0000  0.0000  PAD_IN_6
+u_pad_tdi                            12.9020      0.1    12.9020     0.0000  0.0000  PAD_IN_4
+u_pad_tdo                            12.9020      0.1    12.9020     0.0000  0.0000  PAD_OUT_11
+u_pad_test_se                        12.9020      0.1    12.9020     0.0000  0.0000  PAD_IN_1
+u_pad_test_si                        12.9020      0.1    12.9020     0.0000  0.0000  PAD_IN_2
+u_pad_test_so                        12.9020      0.1    12.9020     0.0000  0.0000  PAD_OUT_10
+u_pad_tms                            12.9020      0.1    12.9020     0.0000  0.0000  PAD_IN_5
+u_pad_trst_n                         12.9020      0.1    12.9020     0.0000  0.0000  PAD_IN_3
+--------------------------------  ----------  -------  ---------  ---------  ------  ---------------------
+Total                                                  9731.7000  7998.1640  0.0000
+
+1
+
+--- Power ---
+Information: Propagating switching activity (low effort zero delay simulation). (PWR-6)
+ 
+****************************************
+Report : power
+        -analysis_effort low
+Design : CHIP_TOP_PAD
+Version: T-2022.03-SP2
+Date   : Tue May 12 11:36:46 2026
+****************************************
+
+
+Library(s) Used:
+
+    saed90nm_typ (File: /home/master/work/8bitmcu/full_flow/lib/models/saed90nm_typ_ht.db)
+
+
+Operating Conditions: TYPICAL   Library: saed90nm_typ
+Wire Load Model Mode: top
+
+
+Global Operating Voltage = 1.2  
+Power-specific unit information :
+    Voltage Units = 1V
+    Capacitance Units = 1.000000pf
+    Time Units = 1ns
+    Dynamic Power Units = 1mW    (derived from V,C,T units)
+    Leakage Power Units = 1pW
+
+
+Attributes
+----------
+i - Including register clock pin internal power
+
+
+  Cell Internal Power  = 435.335480 uW   (85%)
+  Net Switching Power  = 79.454857 uW   (15%)
+                         ---------
+Total Dynamic Power    = 514.790344 uW  (100%)
+
+Cell Leakage Power     =  49.1938 uW
+
+
+                 Internal         Switching           Leakage            Total
+Power Group      Power            Power               Power              Power   (   %    )  Attrs
+--------------------------------------------------------------------------------------------------
+io_pad           0.000000          0.000000          0.000000          0.000000  (   0.00%)
+memory           0.000000          0.000000          0.000000          0.000000  (   0.00%)
+black_box        0.000000        1.795200e-04          0.000000        1.795200e-04
+                                                                                 (   0.03%)
+clock_network    0.220869        2.983353e-02        1.587372e+05        3.836555e-02
+                                                                                 (   6.82%)  i
+register       8.584151e-02        1.283160e-02        2.316084e+07          0.334329
+                                                                                 (  59.44%)
+sequential       0.000000          0.000000          0.000000          0.000000  (   0.00%)
+combinational    0.128625        3.512173e-02        2.587423e+07          0.189621
+                                                                                 (  33.71%)
+--------------------------------------------------------------------------------------------------
+Total            0.435336 mW     7.796638e-02 mW     4.919381e+07 pW       0.562496 mW
+1
+
+------------------------------------------------------------------------------
+2. PLACE & ROUTE (IC Compiler)
+------------------------------------------------------------------------------
+Status: COMPLETED
+GDS: pnr/results/CHIP_TOP_PAD.gds
+Netlist: pnr/results/CHIP_TOP_PAD_fm.v
+SPEF: pnr/results/CHIP_TOP_PAD.spef
+IR Drop: pnr/reports/ir_drop.rpt
+
+--- QoR Summary ---
+ 
+****************************************
+Report : qor
+Design : CHIP_TOP_PAD
+Version: O-2018.06-SP1
+Date   : Tue May 12 11:43:31 2026
+****************************************
+
+
+  Timing Path Group 'TCK'
+  -----------------------------------
+  Levels of Logic:               7.00
+  Critical Path Length:          8.36
+  Critical Path Slack:          86.64
+  Critical Path Clk Period:    100.00
+  Total Negative Slack:          0.00
+  No. of Violating Paths:        0.00
+  Worst Hold Violation:          0.00
+  Total Hold Violation:          0.00
+  No. of Hold Violations:        0.00
+  -----------------------------------
+
+  Timing Path Group 'clk'
+  -----------------------------------
+  Levels of Logic:              18.00
+  Critical Path Length:          9.63
+  Critical Path Slack:           0.20
+  Critical Path Clk Period:     10.00
+  Total Negative Slack:          0.00
+  No. of Violating Paths:        0.00
+
+--- Area ---
+ 
+****************************************
+Report : area
+Design : CHIP_TOP_PAD
+Version: O-2018.06-SP1
+Date   : Tue May 12 11:43:31 2026
+****************************************
+
+Library(s) Used:
+
+    saed90nm_typ (File: /home/master/work/8bitmcu/full_flow/lib/models/saed90nm_typ_ht.db)
+
+Number of ports:                           31
+Number of nets:                            72
+Number of cells:                           35
+Number of combinational cells:              5
+Number of sequential cells:                 0
+Number of macros/black boxes:               0
+Number of buf/inv:                          3
+Number of references:                      33
+
+Combinational area:               9280.285008
+Buf/Inv area:                     1538.307049
+Noncombinational area:            7738.278014
+Macro/Black Box area:                0.000000
+Net Interconnect area:      undefined  (No wire load specified)
+
+Total cell area:                 17018.563022
+Total area:                 undefined
+1
+
+--- Power ---
+Warning: The following library cells don't have power description:SHFILL1   (PWR-682)
+Information: Propagating switching activity (low effort zero delay simulation). (PWR-6)
+Warning: Design has unannotated primary inputs. (PWR-414)
+Warning: Design has unannotated sequential cell outputs. (PWR-415)
+ 
+****************************************
+Report : power
+        -analysis_effort low
+Design : CHIP_TOP_PAD
+Version: O-2018.06-SP1
+Date   : Tue May 12 11:43:31 2026
+****************************************
+
+
+Library(s) Used:
+
+    saed90nm_typ (File: /home/master/work/8bitmcu/full_flow/lib/models/saed90nm_typ_ht.db)
+
+
+Operating Conditions: TYPICAL   Library: saed90nm_typ
+Wire Load Model Mode: top
+
+
+Global Operating Voltage = 1.2  
+Power-specific unit information :
+    Voltage Units = 1V
+    Capacitance Units = 1.000000pf
+    Time Units = 1ns
+    Dynamic Power Units = 1mW    (derived from V,C,T units)
+    Leakage Power Units = 1pW
+
+
+  Cell Internal Power  = 487.3225 uW   (76%)
+  Net Switching Power  = 151.6409 uW   (24%)
+                         ---------
+Total Dynamic Power    = 638.9634 uW  (100%)
+
+Cell Leakage Power     =  50.9248 uW
+
+
+                 Internal         Switching           Leakage            Total
+Power Group      Power            Power               Power              Power   (   %    )  Attrs
+--------------------------------------------------------------------------------------------------
+io_pad             0.0000            0.0000            0.0000            0.0000  (   0.00%)
+memory             0.0000            0.0000            0.0000            0.0000  (   0.00%)
+black_box          0.0000            0.0000            0.0000            0.0000  (   0.00%)
+clock_network  8.1729e-02        7.2801e-02        2.6485e+06            0.1572  (  22.79%)
+register           0.3058        2.7840e-02        2.2873e+07            0.3565  (  51.70%)
+sequential         0.0000            0.0000            0.0000            0.0000  (   0.00%)
+combinational  9.9813e-02        5.0713e-02        2.5404e+07            0.1759  (  25.51%)
+--------------------------------------------------------------------------------------------------
+Total              0.4873 mW         0.1514 mW     5.0925e+07 pW         0.6896 mW
+1
+
+--- IR Drop Analysis ---
+******************************************
+Report : Power Plan Strategy
+Design : CHIP_TOP_PAD
+Version: O-2018.06-SP1
+Date   : Tue May 12 11:43:23 2026
+******************************************
+1
+
+------------------------------------------------------------------------------
+3. EXTRACTION (StarRC)
+------------------------------------------------------------------------------
+Status: COMPLETED
+Max Corner SPEF: signoff/starrc/results/CHIP_TOP_max.spef
+Min Corner SPEF: signoff/starrc/results/CHIP_TOP_min.spef
+
+------------------------------------------------------------------------------
+4. STATIC TIMING ANALYSIS (PrimeTime)
+------------------------------------------------------------------------------
+Status: COMPLETED
+============================================
+PrimeTime Signoff Summary
+============================================
+Design: CHIP_TOP
+
+Setup Analysis (Worst Corner):
+  WNS:  0.045827
+  TNS:  0
+  Violating Paths: 0
+
+Hold Analysis (Worst Corner):
+  WNS:  0.173676
+  TNS:  0
+  Violating Paths: 0
+
+RESULT: PASS - All timing constraints met.
+============================================
+
+--- Setup Violations ---
+****************************************
+Report : timing
+	-path_type full
+	-delay_type max
+	-slack_lesser_than 0.000000
+	-max_paths 20
+	-sort_by slack
+Design : CHIP_TOP_PAD
+Version: R-2020.09-SP4
+Date   : Tue May 12 11:44:16 2026
+****************************************
+
+No paths with slack less than 0.000000.
+
+1
+
+--- Hold Violations ---
+****************************************
+Report : timing
+	-path_type full
+	-delay_type min
+	-slack_lesser_than 0.000000
+	-max_paths 20
+	-sort_by slack
+Design : CHIP_TOP_PAD
+Version: R-2020.09-SP4
+Date   : Tue May 12 11:44:16 2026
+****************************************
+
+No paths with slack less than 0.000000.
+
+1
+
+------------------------------------------------------------------------------
+5. LOGIC EQUIVALENCE CHECK (Formality)
+------------------------------------------------------------------------------
+Status: PASSED
+
+------------------------------------------------------------------------------
+6. GDS MERGE (Calibre calibredrv)
+------------------------------------------------------------------------------
+Status: COMPLETED
+Merged GDS: pnr/results/CORE_merged.gds
+Size: 2.6M
+Contents: Design + stdcells + SRAM(RAM) + PLL placeholder
+
+------------------------------------------------------------------------------
+7. HIERARCHICAL PARTS EXTRACTION
+------------------------------------------------------------------------------
+Status: NOT FOUND
+
+------------------------------------------------------------------------------
+8. PHYSICAL VERIFICATION (Calibre)
+------------------------------------------------------------------------------
+Status: COMPLETED
+============================================
+Physical Verification Summary
+============================================
+Design: CHIP_TOP_PAD
+GDS:    ../../pnr/results/CORE_merged.gds
+
+DRC:
+  Status:   COMPLETED
+  Errors:   
+  Report:   reports/drc_summary.rpt
+
+LVS:
+  Status:   COMPLETED
+  Result:   UNKNOWN
+  Report:   reports/lvs_report.rpt
+
+Antenna:
+  Status:   COMPLETED
+  Errors:   
+  Report:   reports/antenna_summary.rpt
+
+DRC:      PASS
+LVS:      FAIL
+Antenna:  PASS
+
+RESULT: FAIL - Physical verification issues detected.
+============================================
+
+------------------------------------------------------------------------------
+9. SIGNOFF DELIVERABLES
+------------------------------------------------------------------------------
+Design GDS:       pnr/results/CHIP_TOP_PAD.gds
+Merged GDS:       pnr/results/CORE_merged.gds
+Gate Netlist:     pnr/results/CHIP_TOP_PAD_fm.v
+SDF Timing:       pnr/results/CHIP_TOP_PAD.sdf
+Max SPEF:         signoff/starrc/results/CHIP_TOP_max.spef
+Min SPEF:         signoff/starrc/results/CHIP_TOP_min.spef
+STA Reports:      signoff/pt/reports/
+ECO Commands:     signoff/pt/results/pt_eco.tcl
+GDS Parts:        pnr/results/parts/
+
+Power Design:
+UPF Intent:       syn/results/CORE.upf
+SAIF Activity:    syn/results/CHIP_TOP_PAD.saif
+Synthesis Power:  syn/reports/power.rpt
+PnR Power:        pnr/reports/power.rpt
+IR Drop:          pnr/reports/ir_drop.rpt
+
+==============================================================================
+                              END OF REPORT
+==============================================================================
